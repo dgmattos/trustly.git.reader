@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BLL", "BLL", "{BBA03976-6E14-451D-B4F6-535D89808CE8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{04D06AF7-8105-4DB8-8851-F8D88614352E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bll.lib", "bll.lib\bll.lib.csproj", "{405A5B07-98AF-4A6E-9FFB-1BC694B38B50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "api.cli", "api.cli\api.cli.csproj", "{5EEBE1D0-2AC6-4395-8289-4178DF8713D3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{405A5B07-98AF-4A6E-9FFB-1BC694B38B50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{405A5B07-98AF-4A6E-9FFB-1BC694B38B50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{405A5B07-98AF-4A6E-9FFB-1BC694B38B50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{405A5B07-98AF-4A6E-9FFB-1BC694B38B50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EEBE1D0-2AC6-4395-8289-4178DF8713D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EEBE1D0-2AC6-4395-8289-4178DF8713D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EEBE1D0-2AC6-4395-8289-4178DF8713D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EEBE1D0-2AC6-4395-8289-4178DF8713D3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{405A5B07-98AF-4A6E-9FFB-1BC694B38B50} = {BBA03976-6E14-451D-B4F6-535D89808CE8}
+		{5EEBE1D0-2AC6-4395-8289-4178DF8713D3} = {04D06AF7-8105-4DB8-8851-F8D88614352E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5B0993D6-5E35-4124-BBEB-6F835A3D7149}
+	EndGlobalSection
+EndGlobal
