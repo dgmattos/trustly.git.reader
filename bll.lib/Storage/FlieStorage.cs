@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace bll.lib.Storage
@@ -25,7 +28,7 @@ namespace bll.lib.Storage
         private string setFileName(string value)
         {
             this.file_uri = Path.Combine(path, value);
-            
+
             return value;
         }
 
@@ -37,13 +40,26 @@ namespace bll.lib.Storage
         /// <summary>
         /// Cahce file lifetime
         /// </summary>
-        private int cache_expires = 300;
+        private int cache_expires = 30000;
 
         public FlieStorage(string path)
         {
             this.path = path;
             this.file_name = string.Empty;
             this.file_content = string.Empty;
+        }
+
+        public bool ifDirNotExists()
+        {
+            if (Directory.Exists(this.path))
+            {
+                // This path is a directory
+                return true;
+            }
+            else
+            {
+                throw new DirectoryNotFoundException("Directory not found");
+            }
         }
 
         private void deleteFile()
@@ -55,9 +71,9 @@ namespace bll.lib.Storage
                     File.Delete(this.file_uri);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-
+                throw ex;
             }
         }
 
@@ -90,24 +106,44 @@ namespace bll.lib.Storage
             {
                 if (string.IsNullOrEmpty(this.file_name))
                 {
-                    throw new Exception("File name is invalid.");
+                    throw new ArgumentException("File name is invalid.");
                 }
 
                 string path = this.file_uri;
+
 
                 if (!File.Exists(path))
                 {
                     using (StreamWriter sw = File.CreateText(path))
                     {
+                        int Locked = 0;
+
+                        while (IsFileLocked(path))
+                        {
+                            Locked++;
+                        }
+
                         sw.WriteLine(data);
+                        sw.Close();
                     }
                 }
                 else
                 {
-                    StreamWriter sw = File.AppendText(path);
-                    sw.WriteLine(data);
-                    sw.Close();
+                    int Locked = 0;
+
+                    while (IsFileLocked(path))
+                    {
+                        Locked++;
+                    }
+
+                    using (StreamWriter sw = File.AppendText(path))
+                    {
+                        sw.WriteLine(data);
+                        sw.Close();
+                    }
                 }
+
+                
             }
             catch (Exception ex)
             {
@@ -115,7 +151,25 @@ namespace bll.lib.Storage
             }
         }
 
-        
+
+        public bool IsFileLocked(string filename)
+        {
+            bool Locked = false;
+            try
+            {
+                FileStream fs =
+                    File.Open(filename, FileMode.OpenOrCreate,
+                    FileAccess.ReadWrite, FileShare.None);
+                fs.Close();
+            }
+            catch (IOException ex)
+            {
+                Locked = true;
+            }
+
+            return Locked;
+        }
+
 
         public bool readFileContent()
         {
@@ -123,19 +177,30 @@ namespace bll.lib.Storage
             {
                 if (File.Exists(this.file_uri))
                 {
-                    var content = File.ReadAllText(this.file_uri);
-                    this.file_content = content;
-                    return true;
+                    using (System.IO.StreamReader file = new System.IO.StreamReader(this.file_uri))
+                    {
+
+                        string line;
+
+                        while ((line = file.ReadLine()) != null)
+                        {
+                            this.file_content = line;
+                        }
+
+                        file.Close();
+
+                        return true;
+                    }
                 }
                 else
                 {
                     return false;
                 }
             }
-            catch (Exception ex) 
+            catch (FileNotFoundException)
             {
 
-                throw new Exception("Cache file not Exists", ex);
+                throw new FileNotFoundException("Cache file not Exists");
             }
         }
     }

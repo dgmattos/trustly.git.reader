@@ -57,15 +57,16 @@ namespace bll.lib.RepoReader
             links = new StringBuilder(string.Empty);
         }
 
-        public async Task walker()
+        public async Task walker(bool only_ft_dir = false)
         {
             this.walking = true;
 
-            await _walker_dirs(html_base);
+            await _walker_dirs(html_base, only_ft_dir);
 
             foreach (var file in Files.Where(w => !w.isCheckd))
             {
                 file.isCheckd = true;
+
                 try
                 {
 
@@ -88,6 +89,7 @@ namespace bll.lib.RepoReader
         public bool urlIsRepoDirOrFile(string url, bool isTree = false)
         {
             string tree = this.url_repo_base.TrimEnd('/') + "/" + "tree/";
+
             string blob = this.url_repo_base.TrimEnd('/') + "/" + "blob/";
             //
             if (!url.Contains("&quot;") && (url.Contains(tree) || url.Contains(blob)))
@@ -112,6 +114,12 @@ namespace bll.lib.RepoReader
             }
         }
 
+        /// <summary>
+        /// Get html content affet regex match
+        /// </summary>
+        /// <param name="rexg"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
         private string htmlAffter(Regex rexg, string text)
         {
             string ht = string.Empty;
@@ -119,6 +127,7 @@ namespace bll.lib.RepoReader
             using (StringReader sr = new StringReader(text))
             {
                 int count = 0;
+
                 string line;
 
                 bool mach = false;
@@ -151,7 +160,7 @@ namespace bll.lib.RepoReader
             return st.Replace("href=\"", string.Empty).Replace("\"", string.Empty);
         }
 
-        private async Task _walker_dirs(string str)
+        private async Task _walker_dirs(string str, bool only_ft_dir = false)
         {
             this.walking = true;
 
@@ -194,8 +203,11 @@ namespace bll.lib.RepoReader
 
                     try
                     {
-                        string html = _webcli(dir.dir_url);
-                        await this._walker_dirs(html);
+                        if (!only_ft_dir)
+                        {
+                            string html = _webcli(dir.dir_url);
+                            await this._walker_dirs(html);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -236,7 +248,7 @@ namespace bll.lib.RepoReader
                     }
                 }
 
-                var rgxSize = new Regex(@"((\d+(\.\d*)?|\.\d+)+( KB))");
+                var rgxSize = new Regex(@"((\d+(\.\d*)?|\.\d+)+( \bKB))|((\d+(\.\d*)?|\.\d+)+( \bMB))|((\d+(\.\d*)?|\.\d+)+( \bGB))");
                 var resultsSize = rgxSize.Matches(html);
 
                 foreach (var item in resultsSize)
@@ -245,6 +257,15 @@ namespace bll.lib.RepoReader
                     if (!string.IsNullOrEmpty(st))
                     {
                         float f = float.Parse(Regex.Replace(st, @"[^\d]", "")) / 100;
+
+                        if (st.Contains("MB"))
+                        {
+                            f = f * 1024;
+                        }else if (st.Contains("GB"))
+                        {
+                            f = f * 1024* 1024;
+                        }
+
                         fd.size = f;
                     }
 
@@ -284,13 +305,13 @@ namespace bll.lib.RepoReader
             }
         }
 
-        public List<ResultDataModel> repositorySize()
+        public List<SizeResultDataModel> repositorySize()
         {
-            List<ResultDataModel> sizes = new List<ResultDataModel>();
+            List<SizeResultDataModel> sizes = new List<SizeResultDataModel>();
 
             foreach (var item in this.Files.GroupBy(g => g.extension))
             {
-                sizes.Add(new ResultDataModel
+                sizes.Add(new SizeResultDataModel
                 {
                     ext = item.First().extension,
                     lines = item.Sum(s => s.lines),

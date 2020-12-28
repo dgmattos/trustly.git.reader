@@ -8,7 +8,7 @@ namespace bll.lib.Model
 {
     
 
-    public class ResultDataModel
+    public class SizeResultDataModel
     {
         public string ext { get; set; }
         
@@ -20,7 +20,7 @@ namespace bll.lib.Model
 
         public string size_unity = "kb";
 
-        public ResultDataModel()
+        public SizeResultDataModel()
         {
 
         }

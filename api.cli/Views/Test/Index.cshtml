@@ -7,7 +7,7 @@
 <h2>Index</h2>
 
 
-@using (Html.BeginForm("Github", "api", FormMethod.Get, new { target = "_blank" }))
+@using (Html.BeginForm("Github", "api",FormMethod.Get,new { target = "_blank"}))
 {
     <div class="form-horizontal">
         <h4>GithubModel</h4>
@@ -29,7 +29,9 @@
     </div>
 }
 
-
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

@@ -1,4 +1,5 @@
 ﻿using bll.lib.Http;
+using bll.lib.Model;
 using bll.lib.Storage;
 using bll.lib.Util;
 using Newtonsoft.Json;
@@ -39,7 +40,7 @@ namespace bll.lib.RepoReader
         }
 
 
-        public string Get()
+        public async Task<string> Get(bool only_ft_dir = false)
         {
             try
             {
@@ -52,17 +53,18 @@ namespace bll.lib.RepoReader
                     else
                     {
                         HttpClient cli = new HttpClient();
+                        
                         html = cli.getUrlContent(url_repo);
 
-                        //TODO - READ DATA
-
+                        //READ DATA
                         RepoFinder finder = new RepoFinder(html);
 
                         finder.url_repo_base = string.Format("{0}{1}",this.repo_user,this.repo_name);
 
-                        Task.Run(async () => await finder.walker());
+                        Task.Run(async () => await finder.walker(only_ft_dir));
 
                         int x = 0;
+
                         do
                         {
                             x++;
@@ -72,7 +74,10 @@ namespace bll.lib.RepoReader
                         int files = finder.Directories.Count();
 
                         //SUM SIZE
-                        var size = finder.repositorySize();
+                        var size = new JsonResultDataModel(this.url_repo,"finished", finder.repositorySize());
+
+
+                           
                         
                         string json = JsonConvert.SerializeObject(size);
                         
@@ -110,6 +115,7 @@ namespace bll.lib.RepoReader
             if (uri.Host.Equals("github.com"))
             {
                 this.getRepoInfo(uri);
+
                 return true;
             }
 
@@ -132,7 +138,5 @@ namespace bll.lib.RepoReader
                 throw new Exception("not possible to extract the property data from the repository",ex);
             }
         }
-
-
     }
 }

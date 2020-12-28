@@ -4,29 +4,57 @@ using bll.lib.Storage;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Description;
+using System.Web.Mvc;
 
 namespace api.cli.Controllers
 {
     public class GithubController : ApiController
     {
 
-        // POST api/Github
-        public Object Post(string url_repo)
+        // POST api/Github/{url}
+        
+        public Object Get(string url)
         {
-            FlieStorage fs = new FlieStorage(HttpContext.Current.Server.MapPath("~/App_Data/"));
+            try
+            {
+                if (string.IsNullOrEmpty(url))
+                {
+                    throw new ArgumentException("the url parameter does not exist");
+                }
 
-            RepoReader rr = new RepoReader(url_repo, fs);
-            
-            string result = rr.Get();
+                FlieStorage fs = new FlieStorage(HttpContext.Current.Server.MapPath("~/App_Data/"));
+                
+                fs.ifDirNotExists();
+                
+                RepoReader rr = new RepoReader(url, fs);
 
-            object json = JsonConvert.DeserializeObject<object>(result);
+                var run = Task.Run(() => rr.Get(false));
 
-            return new { data = json, storage = fs };
+                string result = run.Result;
+
+                object json = JsonConvert.DeserializeObject<object>(result);
+
+                return Ok(new { json });
+            }
+            catch (Exception ex)
+            {
+                var hasInner = ex;
+
+                while (hasInner.InnerException != null)
+                {
+                    hasInner = hasInner.InnerException;
+                }
+
+                return BadRequest(hasInner.Message);
+            }
         }
     }
 }

@@ -78,7 +78,8 @@
     <Compile Include="Model\DirRepoModel.cs" />
     <Compile Include="Model\FileDataModel.cs" />
     <Compile Include="Model\FileRepoModel.cs" />
-    <Compile Include="Model\ResultDataModel.cs" />
+    <Compile Include="Model\JsonResultDataModel.cs" />
+    <Compile Include="Model\SizeResultDataModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RepoReader\RepoFinder.cs" />
     <Compile Include="RepoReader\RepoReader.cs" />

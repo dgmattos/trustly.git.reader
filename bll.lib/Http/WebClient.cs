@@ -42,16 +42,32 @@ namespace bll.lib.Http
 
         protected override WebResponse GetWebResponse(WebRequest request, IAsyncResult result)
         {
-            WebResponse response = base.GetWebResponse(request, result);
-            ReadCookies(response);
-            return response;
+            try
+            {
+                WebResponse response = base.GetWebResponse(request, result);
+                ReadCookies(response);
+                return response;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("Response fail code: 54", ex);
+            }
         }
 
         protected override WebResponse GetWebResponse(WebRequest request)
         {
-            WebResponse response = base.GetWebResponse(request);
-            ReadCookies(response);
-            return response;
+            try
+            {
+                WebResponse response = base.GetWebResponse(request);
+                ReadCookies(response);
+                return response;
+            }
+            catch (Exception)
+            {
+
+                throw new Exception("Repository not found");
+            }
         }
 
         private void ReadCookies(WebResponse r)
